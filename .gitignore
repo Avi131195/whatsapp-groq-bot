@@ -1,0 +1,12 @@
+# Ignore everything
+*
+
+# But not these files
+!.gitignore
+!app.py
+!main.py
+!requirements.txt
+
+# Ignore virtual environment and secrets
+venv/
+.env
