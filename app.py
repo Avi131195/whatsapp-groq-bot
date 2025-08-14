@@ -4,27 +4,27 @@ from flask import Flask, request
 from twilio.twiml.messaging_response import MessagingResponse
 import groq
 
-# Load environment variables from .env file
-load_dotenv()
+load_dotenv()  # Load .env file
 
-# Initialize Groq client with API key
 client = groq.Client(api_key=os.getenv("GROQ_API_KEY"))
 
-# Initialize Flask app
 app = Flask(__name__)
 
-# Webhook route for incoming WhatsApp messages
+# ✅ NEW: Home route for GET testing
+@app.route("/", methods=["GET"])
+def home():
+    return "✅ App is live!"
+
 @app.route("/whatsapp_webhook", methods=["POST"])
 def whatsapp_webhook():
     incoming_msg = request.values.get('Body', '').strip()
-    print(f"📩 Received from WhatsApp: {incoming_msg}")  # For logging
-
     resp = MessagingResponse()
     msg = resp.message()
 
     try:
+        print("📩 Incoming message:", incoming_msg)  # For logs
         chat_completion = client.chat.completions.create(
-            model="llama3-70b-8192",  # ✅ Make sure this is a supported model
+            model="llama3-70b-8192",
             messages=[
                 {"role": "system", "content": "You are a helpful assistant."},
                 {"role": "user", "content": incoming_msg}
@@ -38,6 +38,6 @@ def whatsapp_webhook():
 
     return str(resp)
 
-# Only used when running locally (not needed on Render)
+# Only used for local testing
 if __name__ == "__main__":
     app.run(debug=True, port=5000)
